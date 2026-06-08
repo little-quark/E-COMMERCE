@@ -1,3 +1,6 @@
+(function () {
+'use strict';
+
 const CART_KEY_PREFIX = 'cart_';
 const ORDERS_KEY = 'user_orders';
 const OFFLINE_ORDERS_KEY = 'offline_orders_queue';
@@ -50,57 +53,14 @@ function saveCartToStorage() {
 
 function getProductById(productId) {
   const normalizedId = String(productId);
-
-  console.log('[Cart:getProductById]', {
-    step: 'start',
-    productId: normalizedId,
-    productIdType: typeof productId,
-  });
-
   const raw = localStorage.getItem(PRODUCTS_KEY);
-
-  if (!raw) {
-    console.log('[Cart:getProductById]', {
-      step: 'storage-miss',
-      key: PRODUCTS_KEY,
-      productId: normalizedId,
-    });
-    return null;
-  }
+  if (!raw) return null;
 
   try {
     const products = JSON.parse(raw);
-
-    if (!Array.isArray(products)) {
-      console.log('[Cart:getProductById]', {
-        step: 'invalid-storage-shape',
-        key: PRODUCTS_KEY,
-        productId: normalizedId,
-      });
-      return null;
-    }
-
-    console.log('[Cart:getProductById]', {
-      step: 'search',
-      productId: normalizedId,
-      totalProducts: products.length,
-    });
-
-    const product = products.find((p) => String(p.id) === normalizedId) || null;
-
-    console.log('[Cart:getProductById]', {
-      step: product ? 'found' : 'not-found',
-      productId: normalizedId,
-      matchedId: product ? String(product.id) : null,
-    });
-
-    return product;
-  } catch (error) {
-    console.log('[Cart:getProductById]', {
-      step: 'parse-error',
-      productId: normalizedId,
-      error: error.message,
-    });
+    if (!Array.isArray(products)) return null;
+    return products.find((p) => String(p.id) === normalizedId) || null;
+  } catch {
     return null;
   }
 }
@@ -138,59 +98,21 @@ function getItemCount() {
 }
 
 function addItem(product) {
-  console.log('[Cart:addItem]', {
-    step: 'start',
-    hasProduct: Boolean(product),
-    productId: product ? String(product.id) : null,
-  });
-
   if (!product || product.id === undefined || product.id === null) {
-    console.log('[Cart:addItem]', {
-      step: 'rejected',
-      reason: 'product-not-found',
-      productId: product ? String(product.id) : null,
-    });
     return { success: false, message: 'Producto no encontrado.' };
   }
 
   const normalizedId = String(product.id);
-
   const existing = cartItems.find((item) => String(item.productId) === normalizedId);
-
-  console.log('[Cart:addItem]', {
-    step: 'lookup-cart',
-    productId: normalizedId,
-    alreadyInCart: Boolean(existing),
-    currentQuantity: existing ? existing.quantity : 0,
-    cartSizeBefore: cartItems.length,
-  });
 
   if (existing) {
     existing.quantity += 1;
-    console.log('[Cart:addItem]', {
-      step: 'increment-existing',
-      productId: normalizedId,
-      newQuantity: existing.quantity,
-    });
   } else {
     cartItems.push(normalizeCartItem(product));
-    console.log('[Cart:addItem]', {
-      step: 'push-new',
-      productId: normalizedId,
-      cartSizeAfter: cartItems.length,
-    });
   }
 
   saveCartToStorage();
   renderCart();
-
-  console.log('[Cart:addItem]', {
-    step: 'complete',
-    productId: normalizedId,
-    cartSize: cartItems.length,
-    itemCount: getItemCount(),
-  });
-
   return { success: true, message: 'Producto añadido al carrito.' };
 }
 
@@ -633,52 +555,15 @@ function handleAddToCart(e) {
   const btn = e.target.closest('[data-add-to-cart]');
   if (!btn) return;
 
-  console.log('[Cart:handleAddToCart]', {
-    step: 'click',
-    rawDatasetId: btn.dataset.addToCart,
-    datasetIdType: typeof btn.dataset.addToCart,
-  });
-
   const rawId = btn.dataset.addToCart;
+  if (rawId === undefined || rawId === '') return;
 
-  if (rawId === undefined || rawId === '') {
-    console.log('[Cart:handleAddToCart]', {
-      step: 'rejected',
-      reason: 'missing-dataset-id',
-    });
-    return;
-  }
-
-  const productId = String(rawId);
-
-  console.log('[Cart:handleAddToCart]', {
-    step: 'id-extracted',
-    productId,
-    productIdType: typeof productId,
-  });
-
-  const product = getProductById(productId);
-
-  console.log('[Cart:handleAddToCart]', {
-    step: 'storage-lookup',
-    productId,
-    found: Boolean(product),
-    matchedId: product ? String(product.id) : null,
-  });
-
+  const product = getProductById(String(rawId));
   const result = addItem(product);
-
-  console.log('[Cart:handleAddToCart]', {
-    step: 'add-result',
-    productId,
-    success: result.success,
-    message: result.message,
-  });
 
   if (result.success) {
     btn.classList.add('product-card__add-btn--added');
     btn.textContent = '¡Añadido!';
-    alert('Producto añadido al carrito con éxito.');
 
     setTimeout(() => {
       btn.classList.remove('product-card__add-btn--added');
@@ -784,3 +669,5 @@ const Cart = {
 };
 
 window.Cart = Cart;
+
+})();
