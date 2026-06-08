@@ -14,6 +14,7 @@
   <script src="theme.js" defer></script>
   <script src="data.js" defer></script>
   <script src="auth.js" defer></script>
+  <script src="cart.js" defer></script>
 </head>
 <body>
   <header class="site-header" id="inicio">
@@ -54,12 +55,13 @@
           <span class="theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true">☾</span>
         </button>
 
-        <a href="#carrito" class="site-header__action-btn" aria-label="Carrito">
+        <a href="#carrito" class="site-header__action-btn site-header__cart-link" id="header-cart-link" aria-label="Carrito">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M3 6h18M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span class="site-header__action-label">Carrito</span>
+          <span class="site-header__cart-badge" id="cart-badge" hidden>0</span>
         </a>
 
         <a href="auth.html" class="site-header__action-btn" aria-label="Iniciar sesión" id="header-auth-link">
@@ -143,6 +145,78 @@
         <div class="catalog__grid" id="catalog-grid"></div>
       </div>
     </section>
+
+    <section class="cart" id="carrito" aria-labelledby="cart-title">
+      <div class="container">
+        <h2 class="section-title" id="cart-title">Tu carrito</h2>
+
+        <div class="cart__layout">
+          <div class="cart__items-wrap">
+            <p class="cart__empty" id="cart-empty">Tu carrito está vacío. Explora el catálogo y añade productos.</p>
+            <ul class="cart__items" id="cart-items" aria-live="polite"></ul>
+          </div>
+
+          <aside class="cart__summary" aria-labelledby="cart-summary-title">
+            <h3 class="cart__summary-title" id="cart-summary-title">Resumen del pedido</h3>
+            <dl class="cart__totals">
+              <div class="cart__total-row">
+                <dt>Subtotal</dt>
+                <dd id="cart-subtotal">0,00&nbsp;US$</dd>
+              </div>
+              <div class="cart__total-row">
+                <dt>Envío</dt>
+                <dd id="cart-shipping">0,00&nbsp;US$</dd>
+              </div>
+              <div class="cart__total-row cart__total-row--total">
+                <dt>Total</dt>
+                <dd id="cart-total">0,00&nbsp;US$</dd>
+              </div>
+            </dl>
+            <p class="cart__shipping-note">Envío gratis en pedidos superiores a 50&nbsp;US$</p>
+            <button type="button" class="btn btn--primary cart__checkout-btn" id="cart-checkout-btn" disabled>
+              Ir al checkout
+            </button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="cart-checkout" id="cart-checkout" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cart-checkout-title">
+      <div class="cart-checkout__backdrop" id="cart-checkout-backdrop"></div>
+      <div class="cart-checkout__panel">
+        <header class="cart-checkout__header">
+          <h2 class="cart-checkout__title" id="cart-checkout-title">Pasarela de pago</h2>
+          <button type="button" class="cart-checkout__close" id="cart-checkout-close" aria-label="Cerrar">×</button>
+        </header>
+
+        <p class="cart-checkout__hint">Simulación educativa — no se procesan pagos reales.</p>
+
+        <div class="cart-checkout__alert auth-alert auth-alert--error" id="cart-checkout-alert" hidden role="alert"></div>
+        <div class="cart-checkout__success" id="cart-checkout-success" hidden></div>
+
+        <form class="cart-checkout__form" id="cart-checkout-form" novalidate>
+          <div class="cart-checkout__field">
+            <label for="card-name">Titular de la tarjeta</label>
+            <input type="text" id="card-name" name="cardName" autocomplete="cc-name" placeholder="Como aparece en la tarjeta" required>
+          </div>
+          <div class="cart-checkout__field">
+            <label for="card-number">Número de tarjeta</label>
+            <input type="text" id="card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" required>
+          </div>
+          <div class="cart-checkout__row">
+            <div class="cart-checkout__field">
+              <label for="card-expiry">Caducidad</label>
+              <input type="text" id="card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" required>
+            </div>
+            <div class="cart-checkout__field">
+              <label for="card-cvv">CVV</label>
+              <input type="text" id="card-cvv" name="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn--primary cart-checkout__submit">Confirmar pago</button>
+        </form>
+      </div>
+    </div>
 
     <section class="benefits" aria-labelledby="benefits-title">
       <div class="container">

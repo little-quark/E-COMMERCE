@@ -113,6 +113,9 @@ function createProductCard(product, variant = 'catalog') {
           ★ ${product.rating.rate}
         </span>
       </div>
+      <button type="button" class="btn btn--primary product-card__add-btn" data-add-to-cart="${product.id}">
+        Añadir al carrito
+      </button>
     </div>
   `;
 

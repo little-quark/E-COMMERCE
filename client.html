@@ -12,6 +12,7 @@
   </script>
   <link rel="stylesheet" href="styles.css">
   <script src="auth.js"></script>
+  <script src="cart.js"></script>
   <script>
     AuthGuard.blockCrossAccess('Cliente');
   </script>
@@ -39,10 +40,16 @@
       <p class="module-header__subtitle" id="client-welcome">Bienvenido</p>
     </div>
 
+    <section class="module-orders" aria-labelledby="orders-title">
+      <h2 class="module-section-title" id="orders-title">Mis pedidos</h2>
+      <p class="module-card__text" id="orders-empty" hidden>Aún no has realizado ninguna compra.</p>
+      <ul class="orders-list" id="orders-list" aria-live="polite"></ul>
+    </section>
+
     <div class="module-grid">
       <article class="module-card">
-        <h2 class="module-card__title">Mis pedidos</h2>
-        <p class="module-card__text">Consulta el historial y estado de tus compras.</p>
+        <h2 class="module-card__title">Catálogo</h2>
+        <p class="module-card__text">Explora productos y añádelos a tu carrito.</p>
         <a href="index.html#catalogo" class="btn btn--primary">Ir al catálogo</a>
       </article>
       <article class="module-card">
@@ -67,12 +74,42 @@
       var user = Auth.getCurrentUser();
       if (user) {
         document.getElementById('client-welcome').textContent = 'Bienvenido, ' + user.name;
+        renderOrderHistory(user.id);
       }
       document.getElementById('module-logout').addEventListener('click', function () {
         Auth.logout();
         window.location.href = 'auth.html';
       });
     });
+
+    function renderOrderHistory(userId) {
+      var orders = Cart.getOrderHistory(userId);
+      var list = document.getElementById('orders-list');
+      var empty = document.getElementById('orders-empty');
+      if (!list) return;
+
+      list.innerHTML = '';
+      if (orders.length === 0) {
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (empty) empty.hidden = true;
+
+      orders.forEach(function (order) {
+        var li = document.createElement('li');
+        li.className = 'orders-list__item';
+        var date = new Date(order.createdAt).toLocaleString('es-ES');
+        var itemCount = order.items.reduce(function (sum, item) { return sum + item.quantity; }, 0);
+        li.innerHTML =
+          '<div class="orders-list__header">' +
+            '<span class="orders-list__id">' + order.id + '</span>' +
+            '<span class="orders-list__date">' + date + '</span>' +
+          '</div>' +
+          '<p class="orders-list__total">' + Cart.formatPrice(order.total) + '</p>' +
+          '<p class="orders-list__items">' + itemCount + ' producto(s) · ' + order.status + '</p>';
+        list.appendChild(li);
+      });
+    }
   </script>
 </body>
 </html>
