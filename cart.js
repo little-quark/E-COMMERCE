@@ -1,5 +1,6 @@
 const CART_KEY_PREFIX = 'cart_';
 const ORDERS_KEY = 'user_orders';
+const OFFLINE_ORDERS_KEY = 'offline_orders_queue';
 const PRODUCTS_KEY = 'local_products';
 const SHIPPING_FREE_THRESHOLD = 50;
 const SHIPPING_COST = 5.99;
@@ -178,6 +179,27 @@ function saveOrder(order) {
   saveAllOrders(all);
 }
 
+function getOfflineOrdersQueue() {
+  const raw = localStorage.getItem(OFFLINE_ORDERS_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveOfflineOrdersQueue(queue) {
+  localStorage.setItem(OFFLINE_ORDERS_KEY, JSON.stringify(queue));
+}
+
+function enqueueOfflineOrder(order) {
+  const queue = getOfflineOrdersQueue();
+  queue.push(order);
+  saveOfflineOrdersQueue(queue);
+}
+
 function generateOrderId() {
   return `order-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
@@ -304,6 +326,23 @@ function processCheckout(form) {
     status: 'completed',
     createdAt: new Date().toISOString(),
   };
+
+  if (!navigator.onLine) {
+    const offlineOrder = {
+      ...order,
+      status: 'Pendiente',
+      pendingSync: true,
+    };
+    enqueueOfflineOrder(offlineOrder);
+    clearCart();
+    closeCheckoutModal();
+    return {
+      success: true,
+      message: 'Compra guardada localmente. Se procesará al recuperar la conexión.',
+      order: offlineOrder,
+      offline: true,
+    };
+  }
 
   saveOrder(order);
   clearCart();
