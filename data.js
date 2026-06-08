@@ -149,14 +149,21 @@ function renderFeaturedCarousel(products) {
 
 function updateCarouselPosition() {
   const track = els.carouselTrack;
-  const slides = track?.querySelectorAll('.carousel__slide');
-  if (!track || !slides.length) return;
+  if (!track) return;
+
+  const slides = track.querySelectorAll('.carousel__slide');
+  if (!slides.length) return;
+
+  const viewport = track.parentElement;
+  const slideWidth = viewport ? viewport.offsetWidth : slides[0].offsetWidth;
+  track.style.transform = `translateX(-${carouselIndex * slideWidth}px)`;
 
   slides.forEach((slide, i) => {
     slide.classList.toggle('carousel__slide--active', i === carouselIndex);
+    slide.setAttribute('aria-hidden', i !== carouselIndex ? 'true' : 'false');
   });
 
-  track.querySelectorAll('.carousel__dot').forEach((dot, i) => {
+  els.carouselDots?.querySelectorAll('.carousel__dot').forEach((dot, i) => {
     dot.classList.toggle('carousel__dot--active', i === carouselIndex);
   });
 }
@@ -165,7 +172,8 @@ function goToSlide(index) {
   const slides = els.carouselTrack?.querySelectorAll('.carousel__slide');
   if (!slides?.length) return;
 
-  carouselIndex = ((index % slides.length) + slides.length) % slides.length;
+  const total = slides.length;
+  carouselIndex = ((index % total) + total) % total;
   updateCarouselPosition();
   resetCarouselAutoplay();
 }
