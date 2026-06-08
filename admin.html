@@ -11,11 +11,67 @@
     })();
   </script>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .module-card__top-list {
+      list-style: none;
+      font-size: var(--font-size-sm);
+      color: var(--color-text);
+    }
+    .module-card__top-list li {
+      padding: var(--space-xs) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .module-card__top-list li:last-child {
+      border-bottom: none;
+    }
+    .admin-table-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+    .btn--sm {
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-size-sm);
+    }
+    .admin-order-status {
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-size: var(--font-size-sm);
+      font-family: inherit;
+    }
+    body.admin-modal-open {
+      overflow: hidden;
+    }
+    .admin-inventory,
+    .admin-sales,
+    .admin-users {
+      margin-bottom: var(--space-xl);
+    }
+    .module-card__stat-sub {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+  </style>
   <script src="auth.js"></script>
   <script>
     AuthGuard.blockCrossAccess('Administrador');
   </script>
   <script src="theme.js" defer></script>
+  <script src="admin.js" defer></script>
 </head>
 <body class="module-page">
   <header class="site-header site-header--minimal">
@@ -41,21 +97,60 @@
 
     <div class="module-grid">
       <article class="module-card">
-        <h2 class="module-card__title">Productos</h2>
-        <p class="module-card__text">Gestiona el catálogo almacenado en LocalStorage.</p>
-        <p class="module-card__stat" id="admin-product-count">—</p>
+        <h2 class="module-card__title">Ingresos totales</h2>
+        <p class="module-card__text">Suma de todas las ventas en LocalStorage.</p>
+        <p class="module-card__stat" id="admin-total-revenue">—</p>
+      </article>
+      <article class="module-card">
+        <h2 class="module-card__title">Top 3 productos</h2>
+        <p class="module-card__text">Más vendidos por unidades.</p>
+        <ul class="module-card__top-list" id="admin-top-products" aria-live="polite"></ul>
       </article>
       <article class="module-card">
         <h2 class="module-card__title">Usuarios</h2>
-        <p class="module-card__text">Usuarios registrados en el sistema.</p>
-        <p class="module-card__stat" id="admin-user-count">—</p>
-      </article>
-      <article class="module-card">
-        <h2 class="module-card__title">Pedidos</h2>
-        <p class="module-card__text">Supervisión de pedidos y ventas.</p>
-        <span class="module-card__badge">Próximamente</span>
+        <p class="module-card__text">Registrados vs. activos (con pedidos).</p>
+        <p class="module-card__stat" id="admin-user-stats">—</p>
+        <span class="module-card__stat-sub">registrados / activos</span>
       </article>
     </div>
+
+    <section class="admin-inventory" aria-labelledby="admin-inventory-title">
+      <div class="admin-section-header">
+        <h2 id="admin-inventory-title" class="module-section-title">Gestión de inventario</h2>
+        <button type="button" class="btn btn--primary" id="admin-product-create-btn">Nuevo producto</button>
+      </div>
+      <div class="admin-users__table-wrap">
+        <table class="admin-users__table" id="admin-products-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="admin-products-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-sales" aria-labelledby="admin-sales-title">
+      <h2 id="admin-sales-title" class="module-section-title">Administración de ventas</h2>
+      <div class="admin-users__table-wrap">
+        <table class="admin-users__table" id="admin-orders-table">
+          <thead>
+            <tr>
+              <th>ID pedido</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-body"></tbody>
+        </table>
+      </div>
+    </section>
 
     <section class="admin-users" aria-labelledby="admin-users-title">
       <h2 id="admin-users-title" class="module-section-title">Listado de usuarios</h2>
@@ -77,43 +172,5 @@
       Acceso restringido: solo usuarios con rol <strong>Administrador</strong> pueden ver esta página.
     </p>
   </main>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var user = Auth.getCurrentUser();
-      if (user) {
-        document.getElementById('admin-welcome').textContent = 'Hola, ' + user.name;
-      }
-
-      var products = localStorage.getItem('local_products');
-      var productCount = 0;
-      if (products) {
-        try { productCount = JSON.parse(products).length; } catch (e) {}
-      }
-      document.getElementById('admin-product-count').textContent = productCount + ' productos';
-
-      var usersRaw = localStorage.getItem('local_users');
-      var users = [];
-      if (usersRaw) {
-        try { users = JSON.parse(usersRaw); } catch (e) {}
-      }
-      document.getElementById('admin-user-count').textContent = users.length + ' usuarios';
-
-      var tbody = document.getElementById('admin-users-body');
-      users.forEach(function (u) {
-        var tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>' + u.name + '</td>' +
-          '<td>' + u.email + '</td>' +
-          '<td><span class="auth-badge auth-badge--' + (u.role === 'Administrador' ? 'admin' : 'client') + '">' + u.role + '</span></td>';
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('module-logout').addEventListener('click', function () {
-        Auth.logout();
-        window.location.href = 'auth.html';
-      });
-    });
-  </script>
 </body>
 </html>
