@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — ShopVerse</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="auth.js"></script>
+  <script>
+    AuthGuard.blockCrossAccess('Administrador');
+  </script>
+  <script src="theme.js" defer></script>
+</head>
+<body class="module-page">
+  <header class="site-header site-header--minimal">
+    <div class="site-header__inner container">
+      <a href="index.html" class="site-header__logo">ShopVerse</a>
+      <nav class="site-header__actions" aria-label="Navegación">
+        <button type="button" id="theme-toggle" class="site-header__action-btn" aria-label="Cambiar tema" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--light" aria-hidden="true">☀</span>
+          <span class="theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true">☾</span>
+        </button>
+        <a href="auth.html" class="site-header__action-btn">Mi perfil</a>
+        <button type="button" id="module-logout" class="site-header__action-btn">Salir</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="module-main container">
+    <div class="module-header">
+      <span class="auth-badge auth-badge--admin">Administrador</span>
+      <h1 class="module-header__title">Panel de Administración</h1>
+      <p class="module-header__subtitle" id="admin-welcome">Panel de control</p>
+    </div>
+
+    <div class="module-grid">
+      <article class="module-card">
+        <h2 class="module-card__title">Productos</h2>
+        <p class="module-card__text">Gestiona el catálogo almacenado en LocalStorage.</p>
+        <p class="module-card__stat" id="admin-product-count">—</p>
+      </article>
+      <article class="module-card">
+        <h2 class="module-card__title">Usuarios</h2>
+        <p class="module-card__text">Usuarios registrados en el sistema.</p>
+        <p class="module-card__stat" id="admin-user-count">—</p>
+      </article>
+      <article class="module-card">
+        <h2 class="module-card__title">Pedidos</h2>
+        <p class="module-card__text">Supervisión de pedidos y ventas.</p>
+        <span class="module-card__badge">Próximamente</span>
+      </article>
+    </div>
+
+    <section class="admin-users" aria-labelledby="admin-users-title">
+      <h2 id="admin-users-title" class="module-section-title">Listado de usuarios</h2>
+      <div class="admin-users__table-wrap">
+        <table class="admin-users__table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="module-guard-notice" role="note">
+      Acceso restringido: solo usuarios con rol <strong>Administrador</strong> pueden ver esta página.
+    </p>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var user = Auth.getCurrentUser();
+      if (user) {
+        document.getElementById('admin-welcome').textContent = 'Hola, ' + user.name;
+      }
+
+      var products = localStorage.getItem('local_products');
+      var productCount = 0;
+      if (products) {
+        try { productCount = JSON.parse(products).length; } catch (e) {}
+      }
+      document.getElementById('admin-product-count').textContent = productCount + ' productos';
+
+      var usersRaw = localStorage.getItem('local_users');
+      var users = [];
+      if (usersRaw) {
+        try { users = JSON.parse(usersRaw); } catch (e) {}
+      }
+      document.getElementById('admin-user-count').textContent = users.length + ' usuarios';
+
+      var tbody = document.getElementById('admin-users-body');
+      users.forEach(function (u) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + u.name + '</td>' +
+          '<td>' + u.email + '</td>' +
+          '<td><span class="auth-badge auth-badge--' + (u.role === 'Administrador' ? 'admin' : 'client') + '">' + u.role + '</span></td>';
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('module-logout').addEventListener('click', function () {
+        Auth.logout();
+        window.location.href = 'auth.html';
+      });
+    });
+  </script>
+</body>
+</html>

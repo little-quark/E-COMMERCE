@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área Cliente — ShopVerse</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="auth.js"></script>
+  <script>
+    AuthGuard.blockCrossAccess('Cliente');
+  </script>
+  <script src="theme.js" defer></script>
+</head>
+<body class="module-page">
+  <header class="site-header site-header--minimal">
+    <div class="site-header__inner container">
+      <a href="index.html" class="site-header__logo">ShopVerse</a>
+      <nav class="site-header__actions" aria-label="Navegación">
+        <button type="button" id="theme-toggle" class="site-header__action-btn" aria-label="Cambiar tema" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--light" aria-hidden="true">☀</span>
+          <span class="theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true">☾</span>
+        </button>
+        <a href="auth.html" class="site-header__action-btn">Mi perfil</a>
+        <button type="button" id="module-logout" class="site-header__action-btn">Salir</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="module-main container">
+    <div class="module-header">
+      <span class="auth-badge auth-badge--client">Cliente</span>
+      <h1 class="module-header__title">Área de Cliente</h1>
+      <p class="module-header__subtitle" id="client-welcome">Bienvenido</p>
+    </div>
+
+    <div class="module-grid">
+      <article class="module-card">
+        <h2 class="module-card__title">Mis pedidos</h2>
+        <p class="module-card__text">Consulta el historial y estado de tus compras.</p>
+        <a href="index.html#catalogo" class="btn btn--primary">Ir al catálogo</a>
+      </article>
+      <article class="module-card">
+        <h2 class="module-card__title">Mi perfil</h2>
+        <p class="module-card__text">Edita tu nombre, avatar y dirección de envío.</p>
+        <a href="auth.html" class="btn btn--secondary">Editar perfil</a>
+      </article>
+      <article class="module-card">
+        <h2 class="module-card__title">Favoritos</h2>
+        <p class="module-card__text">Productos guardados para comprar más tarde.</p>
+        <span class="module-card__badge">Próximamente</span>
+      </article>
+    </div>
+
+    <p class="module-guard-notice" role="note">
+      Acceso restringido: solo usuarios con rol <strong>Cliente</strong> pueden ver esta página.
+    </p>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var user = Auth.getCurrentUser();
+      if (user) {
+        document.getElementById('client-welcome').textContent = 'Bienvenido, ' + user.name;
+      }
+      document.getElementById('module-logout').addEventListener('click', function () {
+        Auth.logout();
+        window.location.href = 'auth.html';
+      });
+    });
+  </script>
+</body>
+</html>

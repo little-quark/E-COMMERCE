@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso — ShopVerse</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="theme.js" defer></script>
+  <script src="auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <header class="site-header site-header--minimal">
+    <div class="site-header__inner container">
+      <a href="index.html" class="site-header__logo" aria-label="ShopVerse — Inicio">
+        <svg class="site-header__logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        ShopVerse
+      </a>
+      <nav class="site-header__actions" aria-label="Acciones">
+        <button type="button" id="theme-toggle" class="site-header__action-btn" aria-label="Cambiar tema" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--light" aria-hidden="true">☀</span>
+          <span class="theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true">☾</span>
+        </button>
+        <a href="index.html" class="site-header__action-btn">Tienda</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card container">
+      <h1 class="auth-card__title">Acceso a ShopVerse</h1>
+
+      <div class="auth-tabs" role="tablist" aria-label="Opciones de autenticación">
+        <button type="button" class="auth-tabs__btn auth-tabs__btn--active" data-auth-tab="login" role="tab" aria-selected="true">Iniciar sesión</button>
+        <button type="button" class="auth-tabs__btn" data-auth-tab="register" role="tab" aria-selected="false">Registrarse</button>
+        <button type="button" class="auth-tabs__btn" data-auth-tab="recovery" role="tab" aria-selected="false">Recuperar</button>
+      </div>
+
+      <div id="auth-alert" class="auth-alert" role="alert" hidden></div>
+
+      <!-- Login -->
+      <section id="panel-login" class="auth-panel" aria-labelledby="login-heading">
+        <h2 id="login-heading" class="visually-hidden">Iniciar sesión</h2>
+        <form id="login-form" class="auth-form">
+          <div class="auth-form__group">
+            <label for="login-email">Correo electrónico</label>
+            <input type="email" id="login-email" name="email" required autocomplete="email" placeholder="tu@email.com">
+          </div>
+          <div class="auth-form__group">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn--primary auth-form__submit">Entrar</button>
+        </form>
+        <p class="auth-hint">
+          ¿Olvidaste tu contraseña?
+          <button type="button" class="auth-link" data-auth-tab="recovery">Recuperar acceso</button>
+        </p>
+        <p class="auth-hint auth-hint--demo">
+          Demo admin: <code>admin@shopverse.com</code> / <code>admin123</code>
+        </p>
+      </section>
+
+      <!-- Register -->
+      <section id="panel-register" class="auth-panel" hidden aria-labelledby="register-heading">
+        <h2 id="register-heading" class="visually-hidden">Registrarse</h2>
+        <form id="register-form" class="auth-form">
+          <div class="auth-form__group">
+            <label for="register-name">Nombre completo</label>
+            <input type="text" id="register-name" name="name" required autocomplete="name" placeholder="Tu nombre">
+          </div>
+          <div class="auth-form__group">
+            <label for="register-email">Correo electrónico</label>
+            <input type="email" id="register-email" name="email" required autocomplete="email" placeholder="tu@email.com">
+          </div>
+          <div class="auth-form__group">
+            <label for="register-password">Contraseña</label>
+            <input type="password" id="register-password" name="password" required autocomplete="new-password" minlength="6" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="auth-form__group">
+            <label for="register-confirm">Confirmar contraseña</label>
+            <input type="password" id="register-confirm" name="confirmPassword" required autocomplete="new-password" placeholder="Repite la contraseña">
+          </div>
+          <p class="auth-hint">Al registrarte se te asignará el rol de <strong>Cliente</strong>.</p>
+          <button type="submit" class="btn btn--primary auth-form__submit">Crear cuenta</button>
+        </form>
+      </section>
+
+      <!-- Password recovery -->
+      <section id="panel-recovery" class="auth-panel" hidden aria-labelledby="recovery-heading">
+        <h2 id="recovery-heading" class="auth-panel__subtitle">Recuperar contraseña</h2>
+        <p class="auth-hint">Flujo simulado: se generará un código de recuperación en pantalla.</p>
+        <form id="recovery-form" class="auth-form">
+          <div class="auth-form__group">
+            <label for="recovery-email">Correo electrónico</label>
+            <input type="email" id="recovery-email" name="email" required autocomplete="email" placeholder="tu@email.com">
+          </div>
+          <button type="submit" class="btn btn--primary auth-form__submit">Enviar código simulado</button>
+        </form>
+      </section>
+
+      <!-- Reset password -->
+      <section id="panel-reset" class="auth-panel" hidden aria-labelledby="reset-heading">
+        <h2 id="reset-heading" class="auth-panel__subtitle">Restablecer contraseña</h2>
+        <form id="reset-form" class="auth-form">
+          <div class="auth-form__group">
+            <label for="reset-email">Correo electrónico</label>
+            <input type="email" id="reset-email" name="email" required autocomplete="email">
+          </div>
+          <div class="auth-form__group">
+            <label for="reset-token">Código de recuperación</label>
+            <input type="text" id="reset-token" name="token" required placeholder="Código recibido" autocomplete="off">
+          </div>
+          <div class="auth-form__group">
+            <label for="reset-new-password">Nueva contraseña</label>
+            <input type="password" id="reset-new-password" name="newPassword" required minlength="6" autocomplete="new-password">
+          </div>
+          <div class="auth-form__group">
+            <label for="reset-confirm">Confirmar nueva contraseña</label>
+            <input type="password" id="reset-confirm" name="confirmPassword" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn--primary auth-form__submit">Actualizar contraseña</button>
+        </form>
+      </section>
+
+      <!-- Profile -->
+      <section id="panel-profile" class="auth-panel" hidden aria-labelledby="profile-heading">
+        <h2 id="profile-heading" class="auth-panel__subtitle">Mi perfil</h2>
+        <div class="profile-header">
+          <img id="profile-avatar" class="profile-header__avatar" src="" alt="" width="80" height="80">
+          <div>
+            <p id="profile-name-display" class="profile-header__name"></p>
+            <span id="profile-role-display" class="auth-badge"></span>
+          </div>
+        </div>
+        <form id="profile-form" class="auth-form">
+          <div class="auth-form__group">
+            <label for="profile-name">Nombre</label>
+            <input type="text" id="profile-name" name="name" required autocomplete="name">
+          </div>
+          <div class="auth-form__group">
+            <label for="profile-avatar-url">URL del avatar</label>
+            <input type="url" id="profile-avatar-url" name="avatarUrl" placeholder="https://ejemplo.com/avatar.jpg" autocomplete="off">
+          </div>
+          <div class="auth-form__group">
+            <label for="profile-address">Dirección de envío</label>
+            <textarea id="profile-address" name="shippingAddress" rows="3" placeholder="Calle, número, ciudad, CP…"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary auth-form__submit">Guardar cambios</button>
+        </form>
+        <div class="auth-panel__actions">
+          <a id="profile-module-link" href="#" class="btn btn--secondary">Ir a mi módulo</a>
+          <button type="button" id="logout-btn" class="btn btn--outline">Cerrar sesión</button>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
