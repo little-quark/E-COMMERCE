@@ -105,6 +105,7 @@ newsletterForm?.addEventListener('submit', function (e) {
   newsletterForm.reset();
 });
 
+/* Service Worker deshabilitado temporalmente para depuración
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('sw.js').catch(function (err) {
@@ -112,3 +113,4 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+*/

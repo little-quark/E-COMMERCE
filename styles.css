@@ -655,17 +655,20 @@ a:hover {
 }
 
 .carousel__track {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
   gap: var(--space-md);
+  padding-bottom: var(--space-sm);
+  scrollbar-width: none; /* Oculta la barra en Firefox */
 }
-
+.carousel__track::-webkit-scrollbar {
+  display: none; /* Oculta la barra en Chrome/Safari */
+}
 .carousel__slide {
-  display: none;
-}
-
-.carousel__slide--active {
-  display: block;
+  display: block; /* Sobrescribe el display:none que tenías */
+  flex: 0 0 280px; /* Ancho fijo para cada tarjeta */
+  scroll-snap-align: start;
 }
 
 .carousel__btn {
