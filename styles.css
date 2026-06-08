@@ -612,11 +612,264 @@ a:hover {
 }
 
 /* ==========================================================================
+   Featured Carousel
+   ========================================================================== */
+.featured {
+  padding-block: var(--space-2xl);
+  background-color: var(--color-surface);
+  transition: background-color var(--transition);
+}
+
+.carousel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.carousel__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel__track {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.carousel__slide {
+  display: none;
+}
+
+.carousel__slide--active {
+  display: block;
+}
+
+.carousel__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.carousel__btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.carousel__btn--prev {
+  left: 0;
+}
+
+.carousel__btn--next {
+  right: 0;
+}
+
+.carousel__dots {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.carousel__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-border);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+.carousel__dot--active {
+  background-color: var(--color-primary);
+  transform: scale(1.2);
+}
+
+/* ==========================================================================
+   Catalog & Product Cards
+   ========================================================================== */
+.catalog {
+  padding-block: var(--space-2xl);
+}
+
+.catalog__filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.catalog__filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.catalog__filter-group label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.catalog__filter-group input,
+.catalog__filter-group select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  transition: border-color var(--transition);
+}
+
+.catalog__filter-group input:focus,
+.catalog__filter-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.catalog__count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.catalog__empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-xl);
+}
+
+.catalog__error {
+  text-align: center;
+  color: var(--color-error);
+  padding: var(--space-xl);
+}
+
+.catalog__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition);
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.product-card__image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background-color: var(--color-bg);
+  min-height: 200px;
+}
+
+.product-card__image {
+  max-height: 160px;
+  width: auto;
+  object-fit: contain;
+}
+
+.product-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  flex: 1;
+}
+
+.product-card__category {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--color-accent);
+}
+
+.product-card__title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+.product-card__price {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.product-card__rating {
+  font-size: var(--font-size-sm);
+  color: var(--color-star);
+  font-weight: 600;
+}
+
+.product-card--carousel {
+  max-width: 360px;
+  margin-inline: auto;
+}
+
+.product-card--carousel .product-card__title {
+  font-size: var(--font-size-base);
+}
+
+/* ==========================================================================
    Media Queries (mobile-first)
    ========================================================================== */
 
 @media (min-width: 480px) {
   .benefits__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .catalog__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .catalog__filters {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -675,6 +928,18 @@ a:hover {
 
   .testimonials__grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .catalog__filters {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .catalog__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .carousel {
+    padding-inline: var(--space-3xl);
   }
 
   .newsletter__inner {
@@ -741,5 +1006,9 @@ a:hover {
 
   .testimonials__grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .catalog__grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
